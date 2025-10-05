@@ -60,14 +60,6 @@ npm run seed
 - **API Gateway**: http://localhost:3000
 - **Admin Dashboard**: http://localhost:5173/admin
 
-### 👤 Demo Accounts
-
-| Role | Email | Password | Access Level |
-|------|-------|----------|--------------|
-| Admin | admin@smartlaundry.com | admin123 | Full system control |
-| Staff | staff1@smartlaundry.com | staff123 | Operations management |
-| Customer | customer1@example.com | customer123 | Booking and tracking |
-
 ---
 
 ## 🏗️ Architecture Overview
@@ -526,17 +518,6 @@ gh pr create
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👥 Team ADYA
-
-Built with ❤️ by the ADYA team for the hackathon competition.
-
-### Connect With Us
-- 🌐 **GitHub**: [DevPrasath6/SmartLaundrySystem-ADYA](https://github.com/DevPrasath6/SmartLaundrySystem-ADYA)
-- 📧 **Contact**: team@adya-smartlaundry.com
-- 💼 **LinkedIn**: [Team ADYA](#)
 
 ---
 
