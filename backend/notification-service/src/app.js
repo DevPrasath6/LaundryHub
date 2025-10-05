@@ -65,7 +65,7 @@ const connectDB = async () => {
 // Start server
 const startServer = async () => {
   await connectDB();
-  
+
   server.listen(PORT, () => {
     logger.info(`Notification service listening on port ${PORT}`);
   });

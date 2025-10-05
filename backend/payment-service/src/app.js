@@ -55,7 +55,7 @@ const connectDB = async () => {
 // Start server
 const startServer = async () => {
   await connectDB();
-  
+
   app.listen(PORT, () => {
     logger.info(`Payment service listening on port ${PORT}`);
   });

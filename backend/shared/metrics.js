@@ -7,19 +7,19 @@ class MetricsService {
     this.serviceName = serviceName;
     this.register = new client.Registry();
     this.router = express.Router();
-    
+
     // Set default labels
     this.register.setDefaultLabels({
       service: serviceName,
       version: process.env.npm_package_version || '1.0.0'
     });
-    
+
     // Collect default metrics
-    client.collectDefaultMetrics({ 
+    client.collectDefaultMetrics({
       register: this.register,
       prefix: `${serviceName}_`
     });
-    
+
     this.initializeCustomMetrics();
     this.setupRoutes();
   }
@@ -208,7 +208,7 @@ class MetricsService {
         cpu: process.cpuUsage(),
         timestamp: new Date().toISOString()
       };
-      
+
       res.json(healthMetrics);
     });
   }
@@ -218,7 +218,7 @@ class MetricsService {
     return (req, res, next) => {
       const start = Date.now();
       const route = req.route?.path || req.path;
-      
+
       // Track request size
       const requestSize = parseInt(req.get('content-length')) || 0;
       if (requestSize > 0) {
@@ -256,7 +256,7 @@ class MetricsService {
   // Database operation tracking
   trackDbQuery(operation, collection, duration, error = null) {
     const durationSeconds = duration / 1000;
-    
+
     this.dbQueryDuration.observe(
       { operation, collection },
       durationSeconds
@@ -274,7 +274,7 @@ class MetricsService {
   // Business metrics tracking
   trackBooking(machineType, status, duration = null) {
     this.bookingsTotal.inc({ machine_type: machineType, status });
-    
+
     if (duration && status === 'completed') {
       this.bookingDuration.observe(
         { machine_type: machineType },
@@ -285,7 +285,7 @@ class MetricsService {
 
   trackPayment(method, status, amount) {
     this.paymentsTotal.inc({ method, status });
-    
+
     if (status === 'success' && amount) {
       this.paymentAmount.observe({ method }, amount);
     }
@@ -313,7 +313,7 @@ class MetricsService {
 
   trackMLPrediction(modelType, result, duration) {
     this.mlPredictions.inc({ model_type: modelType, result });
-    
+
     if (duration) {
       this.mlPredictionDuration.observe(
         { model_type: modelType },
@@ -329,7 +329,7 @@ class MetricsService {
   // System metrics updater
   updateSystemMetrics() {
     const memoryUsage = process.memoryUsage();
-    
+
     this.memoryUsage.set({ type: 'heap_used' }, memoryUsage.heapUsed);
     this.memoryUsage.set({ type: 'heap_total' }, memoryUsage.heapTotal);
     this.memoryUsage.set({ type: 'external' }, memoryUsage.external);

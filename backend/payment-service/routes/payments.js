@@ -21,9 +21,9 @@ router.post('/process', [
     const { bookingId, amount, currency, paymentMethod, paymentGateway } = req.body;
 
     // Check if payment already exists for this booking
-    const existingPayment = await Payment.findOne({ 
-      bookingId, 
-      status: { $in: ['completed', 'processing'] } 
+    const existingPayment = await Payment.findOne({
+      bookingId,
+      status: { $in: ['completed', 'processing'] }
     });
 
     if (existingPayment) {
@@ -198,9 +198,9 @@ router.post('/:paymentId/refund', [
 ], async (req, res) => {
   try {
     const { amount, reason } = req.body;
-    
+
     const payment = await Payment.findById(req.params.paymentId);
-    
+
     if (!payment) {
       return res.status(404).json({
         success: false,
@@ -216,7 +216,7 @@ router.post('/:paymentId/refund', [
     }
 
     const refundAmount = amount || payment.amount;
-    
+
     if (refundAmount > payment.amount) {
       return res.status(400).json({
         success: false,

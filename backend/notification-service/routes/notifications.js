@@ -87,7 +87,7 @@ router.post('/', [
     // Send notification through specified channels
     if (channels) {
       const user = await getUserById(userId); // Assume this function exists
-      
+
       for (const channel of channels) {
         try {
           switch (channel) {
@@ -148,11 +148,11 @@ router.patch('/:notificationId/read', [
 ], async (req, res) => {
   try {
     const notification = await Notification.findOneAndUpdate(
-      { 
-        _id: req.params.notificationId, 
-        userId: req.user.id 
+      {
+        _id: req.params.notificationId,
+        userId: req.user.id
       },
-      { 
+      {
         status: 'read',
         readAt: new Date()
       },
@@ -189,11 +189,11 @@ router.patch('/mark-all-read', [
 ], async (req, res) => {
   try {
     const result = await Notification.updateMany(
-      { 
+      {
         userId: req.user.id,
         status: 'unread'
       },
-      { 
+      {
         status: 'read',
         readAt: new Date()
       }

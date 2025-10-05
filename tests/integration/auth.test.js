@@ -8,7 +8,7 @@ describe('Authentication Service Integration Tests', () => {
   beforeAll(async () => {
     testEnv = new TestEnvironment();
     await testEnv.setup();
-    
+
     // Import app after test environment is ready
     app = require('../../backend/auth-service/src/index').app;
   });

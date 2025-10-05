@@ -42,7 +42,7 @@ export function setup() {
 export default function () {
   // Test authentication flow
   const user = users[Math.floor(Math.random() * users.length)];
-  
+
   // Login
   const loginResponse = http.post(`${BASE_URL}/api/auth/login`, JSON.stringify(user), {
     headers: { 'Content-Type': 'application/json' },

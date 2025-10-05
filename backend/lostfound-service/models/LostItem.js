@@ -201,7 +201,7 @@ LostItemSchema.methods.sendNotification = function(type) {
 
 // Static methods
 LostItemSchema.statics.findActiveItems = function() {
-  return this.find({ 
+  return this.find({
     status: { $in: ['active', 'matched'] },
     expiresAt: { $gt: new Date() }
   });
@@ -220,18 +220,18 @@ LostItemSchema.statics.findByLocation = function(location) {
 
 LostItemSchema.statics.findSimilarItems = function(itemType, color, size) {
   const query = { status: 'active', itemType };
-  
+
   if (color) {
     query.$or = [
       { 'color.primary': new RegExp(color, 'i') },
       { 'color.secondary': new RegExp(color, 'i') }
     ];
   }
-  
+
   if (size) {
     query.size = size;
   }
-  
+
   return this.find(query);
 };
 
@@ -259,11 +259,11 @@ LostItemSchema.pre('save', function(next) {
   if (this.isModified('description')) {
     this.description = this.description.toLowerCase().trim();
   }
-  
+
   if (this.isModified('brand')) {
     this.brand = this.brand.toLowerCase().trim();
   }
-  
+
   next();
 });
 

@@ -37,24 +37,24 @@ log_error() {
 # Check if Docker is installed and running
 check_docker() {
     log_info "Checking Docker installation..."
-    
+
     if ! command -v docker &> /dev/null; then
         log_error "Docker is not installed. Please install Docker first."
         exit 1
     fi
-    
+
     if ! docker info &> /dev/null; then
         log_error "Docker is not running. Please start Docker first."
         exit 1
     fi
-    
+
     log_success "Docker is installed and running"
 }
 
 # Check if Docker Compose is available
 check_docker_compose() {
     log_info "Checking Docker Compose availability..."
-    
+
     if docker compose version &> /dev/null; then
         COMPOSE_CMD="docker compose"
     elif command -v docker-compose &> /dev/null; then
@@ -63,14 +63,14 @@ check_docker_compose() {
         log_error "Docker Compose is not available. Please install Docker Compose."
         exit 1
     fi
-    
+
     log_success "Docker Compose is available"
 }
 
 # Check if environment file exists
 check_env_file() {
     log_info "Checking environment configuration..."
-    
+
     if [ ! -f "$ENV_FILE" ]; then
         log_warning "Environment file not found. Creating from template..."
         if [ -f ".env.example" ]; then
@@ -89,13 +89,13 @@ check_env_file() {
 # Install dependencies
 install_dependencies() {
     log_info "Installing project dependencies..."
-    
+
     # Install root dependencies
     if [ -f "package.json" ]; then
         log_info "Installing root package dependencies..."
         npm install
     fi
-    
+
     # Install backend service dependencies
     for service in backend/*/; do
         if [ -f "$service/package.json" ]; then
@@ -103,13 +103,13 @@ install_dependencies() {
             (cd "$service" && npm install)
         fi
     done
-    
+
     # Install frontend dependencies
     if [ -f "frontend/web/package.json" ]; then
         log_info "Installing frontend dependencies..."
         (cd frontend/web && npm install)
     fi
-    
+
     # Install AI/ML dependencies
     if [ -f "ai-ml/requirements.txt" ]; then
         log_info "Installing AI/ML dependencies..."
@@ -121,48 +121,48 @@ install_dependencies() {
             log_warning "Python not found. Skipping AI/ML dependencies."
         fi
     fi
-    
+
     log_success "Dependencies installed"
 }
 
 # Build Docker images
 build_images() {
     log_info "Building Docker images..."
-    
+
     $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" build --parallel
-    
+
     log_success "Docker images built successfully"
 }
 
 # Start services
 start_services() {
     log_info "Starting services..."
-    
+
     # Start infrastructure services first
     log_info "Starting infrastructure services..."
     $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" up -d mongodb redis mqtt-broker
-    
+
     # Wait for infrastructure to be ready
     log_info "Waiting for infrastructure services to be ready..."
     sleep 10
-    
+
     # Start application services
     log_info "Starting application services..."
     $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" up -d
-    
+
     log_success "All services started"
 }
 
 # Check service health
 check_health() {
     log_info "Checking service health..."
-    
+
     # Wait for services to fully start
     sleep 30
-    
+
     # Check if services are running
     services=("mongodb" "redis" "api-gateway" "auth-service" "laundry-service" "payment-service" "notification-service")
-    
+
     for service in "${services[@]}"; do
         if $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" ps "$service" | grep -q "Up"; then
             log_success "$service is running"
@@ -170,17 +170,17 @@ check_health() {
             log_error "$service is not running properly"
         fi
     done
-    
+
     # Check API endpoints
     log_info "Checking API endpoints..."
-    
+
     # API Gateway health check
     if curl -s http://localhost:3000/health > /dev/null; then
         log_success "API Gateway is responding"
     else
         log_warning "API Gateway health check failed"
     fi
-    
+
     # Auth service health check
     if curl -s http://localhost:3001/health > /dev/null; then
         log_success "Auth Service is responding"
@@ -192,41 +192,41 @@ check_health() {
 # Setup database
 setup_database() {
     log_info "Setting up database..."
-    
+
     # Wait for MongoDB to be ready
     log_info "Waiting for MongoDB to be ready..."
-    
+
     max_attempts=30
     attempt=0
-    
+
     while [ $attempt -lt $max_attempts ]; do
         if $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec -T mongodb mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
             log_success "MongoDB is ready"
             break
         fi
-        
+
         attempt=$((attempt + 1))
         log_info "Waiting for MongoDB... (attempt $attempt/$max_attempts)"
         sleep 2
     done
-    
+
     if [ $attempt -eq $max_attempts ]; then
         log_error "MongoDB failed to start properly"
         exit 1
     fi
-    
+
     # Run database migrations (if script exists)
     if [ -f "scripts/db-migrate.sh" ]; then
         log_info "Running database migrations..."
         bash scripts/db-migrate.sh
     fi
-    
+
     # Seed initial data (if script exists)
     if [ -f "scripts/seed-data.js" ]; then
         log_info "Seeding initial data..."
         node scripts/seed-data.js
     fi
-    
+
     log_success "Database setup completed"
 }
 
@@ -284,7 +284,7 @@ show_help() {
 # Main deployment function
 deploy() {
     log_info "Starting Smart Laundry System deployment..."
-    
+
     check_docker
     check_docker_compose
     check_env_file

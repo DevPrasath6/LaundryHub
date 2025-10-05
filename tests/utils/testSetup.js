@@ -13,13 +13,13 @@ class TestEnvironment {
     // Setup in-memory MongoDB for testing
     this.mongoServer = await MongoMemoryServer.create();
     const mongoUri = this.mongoServer.getUri();
-    
+
     await mongoose.connect(mongoUri);
-    
+
     // Setup Redis mock
     const { createClient } = require('redis-mock');
     this.redisClient = createClient();
-    
+
     console.log('Test environment setup complete');
   }
 

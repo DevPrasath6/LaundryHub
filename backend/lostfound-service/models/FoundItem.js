@@ -228,12 +228,12 @@ FoundItemSchema.methods.approveClaim = function(approverUserId, verificationScor
   if (!this.claimProcess.claimedBy) {
     throw new Error('No active claim to approve');
   }
-  
+
   this.claimProcess.approvedBy = approverUserId;
   this.claimProcess.approvalDate = new Date();
   this.claimProcess.verificationScore = verificationScore;
   this.disposition.type = 'return_to_owner';
-  
+
   this.addAuditEntry('claim_approved', approverUserId, `Claim approved with score: ${verificationScore}`);
   return this.save();
 };
@@ -259,7 +259,7 @@ FoundItemSchema.methods.updateStorageLocation = function(location, bagNumber, us
   if (bagNumber) this.storage.bagNumber = bagNumber;
   this.storage.lastAccessed = new Date();
   this.storage.accessCount += 1;
-  
+
   this.addAuditEntry('storage_updated', userId, `Moved to ${location}`);
   return this.save();
 };
@@ -290,14 +290,14 @@ FoundItemSchema.methods.generatePickupCode = function() {
 FoundItemSchema.methods.scheduleDisposition = function(dispositionType, reason, userId) {
   this.disposition.type = dispositionType;
   this.dispositionReason = reason;
-  
+
   // Set disposition date based on type
   const daysToWait = {
     'donate': 30,
     'dispose': 90,
     'auction': 60
   };
-  
+
   this.dispositionDate = new Date(Date.now() + (daysToWait[dispositionType] || 30) * 24 * 60 * 60 * 1000);
   this.addAuditEntry('disposition_scheduled', userId, `Scheduled for ${dispositionType}: ${reason}`);
   return this.save();
@@ -305,7 +305,7 @@ FoundItemSchema.methods.scheduleDisposition = function(dispositionType, reason, 
 
 // Static methods
 FoundItemSchema.statics.findStoredItems = function() {
-  return this.find({ 
+  return this.find({
     status: { $in: ['stored', 'matched'] }
   });
 };
@@ -322,18 +322,18 @@ FoundItemSchema.statics.findByLocation = function(location) {
 
 FoundItemSchema.statics.findSimilarItems = function(itemType, color, size) {
   const query = { status: { $in: ['stored', 'matched'] }, itemType };
-  
+
   if (color) {
     query.$or = [
       { 'color.primary': new RegExp(color, 'i') },
       { 'color.secondary': new RegExp(color, 'i') }
     ];
   }
-  
+
   if (size) {
     query.size = size;
   }
-  
+
   return this.find(query);
 };
 
@@ -369,16 +369,16 @@ FoundItemSchema.pre('save', function(next) {
   if (this.isModified('description')) {
     this.description = this.description.toLowerCase().trim();
   }
-  
+
   if (this.isModified('brand')) {
     this.brand = this.brand.toLowerCase().trim();
   }
-  
+
   // Auto-generate pickup code if claim is initiated
   if (this.isModified('claimProcess.claimedBy') && !this.claimProcess.pickupCode) {
     this.claimProcess.pickupCode = this.generatePickupCode();
   }
-  
+
   next();
 });
 

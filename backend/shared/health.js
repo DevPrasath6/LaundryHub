@@ -16,7 +16,7 @@ class HealthCheckService {
       try {
         const health = await this.performHealthCheck();
         const status = health.status === 'healthy' ? 200 : 503;
-        
+
         res.status(status).json({
           status: health.status,
           timestamp: new Date().toISOString(),
@@ -25,7 +25,7 @@ class HealthCheckService {
           uptime: process.uptime(),
           checks: health.checks
         });
-        
+
         healthLogger.logCheck('overall', health.status, 0, health.checks);
       } catch (error) {
         logError('Health check failed', error);
@@ -42,7 +42,7 @@ class HealthCheckService {
       try {
         const readiness = await this.performReadinessCheck();
         const status = readiness.ready ? 200 : 503;
-        
+
         res.status(status).json({
           ready: readiness.ready,
           timestamp: new Date().toISOString(),
@@ -109,7 +109,7 @@ class HealthCheckService {
       const redisClient = Redis.createClient({ url: process.env.REDIS_URL });
       await redisClient.ping();
       await redisClient.quit();
-      
+
       checks.redis = {
         status: 'healthy',
         duration: Date.now() - redisStart
@@ -126,7 +126,7 @@ class HealthCheckService {
     // Check memory usage
     const memoryUsage = process.memoryUsage();
     const memoryThreshold = 500 * 1024 * 1024; // 500MB threshold
-    
+
     checks.memory = {
       status: memoryUsage.heapUsed < memoryThreshold ? 'healthy' : 'warning',
       heapUsed: memoryUsage.heapUsed,
@@ -188,7 +188,7 @@ class HealthCheckService {
     try {
       const fs = require('fs').promises;
       const stats = await fs.stat(process.cwd());
-      
+
       return {
         status: 'healthy',
         available: 'unknown', // Would need platform-specific implementation
@@ -220,7 +220,7 @@ class HealthCheckService {
             method: 'GET',
             timeout: 5000
           });
-          
+
           services[name] = {
             status: response.ok ? 'healthy' : 'unhealthy',
             duration: Date.now() - startTime,
@@ -241,7 +241,7 @@ class HealthCheckService {
   getSystemMetrics() {
     const memoryUsage = process.memoryUsage();
     const cpuUsage = process.cpuUsage();
-    
+
     return {
       timestamp: new Date().toISOString(),
       system: {
@@ -285,10 +285,10 @@ class HealthCheckService {
   // Performance monitoring
   startPerformanceMonitoring() {
     const interval = parseInt(process.env.PERFORMANCE_MONITOR_INTERVAL) || 30000;
-    
+
     setInterval(() => {
       const metrics = this.getSystemMetrics();
-      
+
       // Log performance warnings
       if (metrics.memory.heapUsed > 400 * 1024 * 1024) { // 400MB
         logWarning('High memory usage detected', {
@@ -296,7 +296,7 @@ class HealthCheckService {
           heapTotal: metrics.memory.heapTotal
         });
       }
-      
+
       // Log system metrics for monitoring
       logInfo('System metrics', {
         type: 'performance_metrics',
@@ -331,7 +331,7 @@ class HealthCheckService {
       try {
         const result = await Promise.race([
           serviceCall(),
-          new Promise((_, reject) => 
+          new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Service timeout')), config.timeout)
           )
         ]);
@@ -361,10 +361,10 @@ class HealthCheckService {
 // Monitoring middleware for response times
 const responseTimeMonitor = (req, res, next) => {
   const start = Date.now();
-  
+
   res.on('finish', () => {
     const duration = Date.now() - start;
-    
+
     // Log slow responses
     if (duration > 1000) {
       logWarning('Slow response detected', {
@@ -375,7 +375,7 @@ const responseTimeMonitor = (req, res, next) => {
       });
     }
   });
-  
+
   next();
 };
 
@@ -383,18 +383,18 @@ const responseTimeMonitor = (req, res, next) => {
 const memoryLeakDetector = () => {
   let baseline = null;
   const interval = 60000; // Check every minute
-  
+
   setInterval(() => {
     const memoryUsage = process.memoryUsage();
-    
+
     if (!baseline) {
       baseline = memoryUsage.heapUsed;
       return;
     }
-    
+
     const growth = memoryUsage.heapUsed - baseline;
     const growthPercent = (growth / baseline) * 100;
-    
+
     if (growthPercent > 50) { // 50% growth from baseline
       logWarning('Potential memory leak detected', {
         currentHeap: memoryUsage.heapUsed,
@@ -403,7 +403,7 @@ const memoryLeakDetector = () => {
         growthPercent
       });
     }
-    
+
     // Update baseline gradually
     baseline = baseline * 0.9 + memoryUsage.heapUsed * 0.1;
   }, interval);
@@ -413,7 +413,7 @@ const memoryLeakDetector = () => {
 const resourceMonitor = () => {
   setInterval(() => {
     const usage = process.resourceUsage();
-    
+
     logInfo('Resource usage', {
       type: 'resource_metrics',
       userCPUTime: usage.userCPUTime,

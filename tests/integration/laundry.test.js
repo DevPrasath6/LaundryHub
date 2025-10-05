@@ -10,10 +10,10 @@ describe('Laundry Service Integration Tests', () => {
   beforeAll(async () => {
     testEnv = new TestEnvironment();
     await testEnv.setup();
-    
+
     // Import app after test environment is ready
     app = require('../../backend/laundry-service/src/app').app;
-    
+
     // Register and login test users
     const userResponse = await request(app)
       .post('/api/auth/register')
@@ -99,7 +99,7 @@ describe('Laundry Service Integration Tests', () => {
 
     it('should update machine status', async () => {
       const machine = generateMockMachine();
-      
+
       const createResponse = await request(app)
         .post('/api/machines')
         .set('Authorization', `Bearer ${staffToken}`)
@@ -281,12 +281,12 @@ describe('Laundry Service Integration Tests', () => {
           machineId: `WASH00${i}`,
           status: 'available'
         });
-        
+
         const response = await request(app)
           .post('/api/machines')
           .set('Authorization', `Bearer ${staffToken}`)
           .send(machine);
-        
+
         machineIds.push(response.body.data._id);
       }
     });
@@ -309,7 +309,7 @@ describe('Laundry Service Integration Tests', () => {
 
     it('should exclude booked machines from availability', async () => {
       const startTime = new Date(Date.now() + 60 * 60 * 1000);
-      
+
       // Book one machine
       await request(app)
         .post('/api/bookings')
@@ -336,7 +336,7 @@ describe('Laundry Service Integration Tests', () => {
   describe('Real-time Updates', () => {
     it('should send real-time machine status updates', async () => {
       const machine = generateMockMachine();
-      
+
       const createResponse = await request(app)
         .post('/api/machines')
         .set('Authorization', `Bearer ${staffToken}`)
@@ -353,7 +353,7 @@ describe('Laundry Service Integration Tests', () => {
   describe('Error Handling', () => {
     it('should handle invalid machine ID', async () => {
       const invalidId = '507f1f77bcf86cd799439011';
-      
+
       await request(app)
         .get(`/api/machines/${invalidId}`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -378,7 +378,7 @@ describe('Laundry Service Integration Tests', () => {
   describe('Performance Tests', () => {
     it('should handle concurrent booking requests', async () => {
       const machine = generateMockMachine();
-      
+
       const createResponse = await request(app)
         .post('/api/machines')
         .set('Authorization', `Bearer ${staffToken}`)
@@ -402,7 +402,7 @@ describe('Laundry Service Integration Tests', () => {
 
       const results = await Promise.allSettled(bookingPromises);
       const successful = results.filter(r => r.status === 'fulfilled' && r.value.status === 201);
-      
+
       expect(successful.length).toBeGreaterThan(0);
     });
   });

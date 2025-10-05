@@ -118,7 +118,7 @@ notificationSchema.statics.getUnreadCount = function(userId) {
 notificationSchema.statics.cleanupOldNotifications = function(daysOld = 30) {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - daysOld);
-  
+
   return this.deleteMany({
     status: 'archived',
     archivedAt: { $lt: cutoffDate }

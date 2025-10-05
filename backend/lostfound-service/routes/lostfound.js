@@ -24,7 +24,7 @@ router.post('/lost-items', auth, validateInput, uploadImages, async (req, res) =
       try {
         const aiFeatures = await processImages(req.uploadedImages);
         await lostItem.updateAIFeatures(aiFeatures);
-        
+
         // Trigger AI matching
         setTimeout(() => runAIMatching(lostItem._id), 1000);
       } catch (aiError) {
@@ -33,7 +33,7 @@ router.post('/lost-items', auth, validateInput, uploadImages, async (req, res) =
     }
 
     await lostItem.populate('reportedBy', 'firstName lastName email');
-    
+
     res.status(201).json({
       success: true,
       data: lostItem,
@@ -67,7 +67,7 @@ router.post('/found-items', auth, checkRole(['staff', 'admin']), validateInput, 
       try {
         const aiFeatures = await processImages(req.uploadedImages);
         await foundItem.updateAIFeatures(aiFeatures);
-        
+
         // Trigger AI matching
         setTimeout(() => runAIMatching(null, foundItem._id), 1000);
       } catch (aiError) {
@@ -79,7 +79,7 @@ router.post('/found-items', auth, checkRole(['staff', 'admin']), validateInput, 
       { path: 'reportedBy', select: 'firstName lastName email' },
       { path: 'staffMember', select: 'firstName lastName' }
     ]);
-    
+
     res.status(201).json({
       success: true,
       data: foundItem,
@@ -100,7 +100,7 @@ router.get('/lost-items/my', auth, async (req, res) => {
   try {
     const { status, page = 1, limit = 10 } = req.query;
     const query = { reportedBy: req.user._id };
-    
+
     if (status) {
       query.status = status;
     }
@@ -136,19 +136,19 @@ router.get('/lost-items/my', auth, async (req, res) => {
 // Get all lost items (staff/admin)
 router.get('/lost-items', auth, checkRole(['staff', 'admin']), async (req, res) => {
   try {
-    const { 
-      status, 
-      itemType, 
-      location, 
-      dateFrom, 
-      dateTo, 
-      page = 1, 
+    const {
+      status,
+      itemType,
+      location,
+      dateFrom,
+      dateTo,
+      page = 1,
       limit = 20,
-      search 
+      search
     } = req.query;
 
     const query = {};
-    
+
     if (status) query.status = status;
     if (itemType) query.itemType = itemType;
     if (location) {
@@ -200,20 +200,20 @@ router.get('/lost-items', auth, checkRole(['staff', 'admin']), async (req, res) 
 // Get all found items (staff/admin)
 router.get('/found-items', auth, checkRole(['staff', 'admin']), async (req, res) => {
   try {
-    const { 
-      status, 
-      itemType, 
-      location, 
-      dateFrom, 
-      dateTo, 
-      page = 1, 
+    const {
+      status,
+      itemType,
+      location,
+      dateFrom,
+      dateTo,
+      page = 1,
       limit = 20,
       search,
       storageLocation
     } = req.query;
 
     const query = {};
-    
+
     if (status) query.status = status;
     if (itemType) query.itemType = itemType;
     if (location) {
@@ -364,7 +364,7 @@ router.post('/found-items/:id/claim', auth, async (req, res) => {
 
     // Process verification questions
     const verificationQuestions = verificationAnswers || [];
-    
+
     await foundItem.initiateClaim(req.user._id, verificationQuestions);
 
     res.json({
@@ -415,7 +415,7 @@ router.patch('/found-items/:id/claim/:action', auth, checkRole(['staff', 'admin'
       foundItem.status = 'stored';
       foundItem.addAuditEntry('claim_rejected', req.user._id, reason || 'Claim rejected');
       await foundItem.save();
-      
+
       res.json({
         success: true,
         data: foundItem,
@@ -576,9 +576,9 @@ router.get('/statistics/matching', auth, checkRole(['staff', 'admin']), async (r
 router.post('/matching/run-ai', auth, checkRole(['staff', 'admin']), async (req, res) => {
   try {
     const { lostItemId, foundItemId } = req.body;
-    
+
     const result = await runAIMatching(lostItemId, foundItemId);
-    
+
     res.json({
       success: true,
       data: result,

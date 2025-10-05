@@ -28,19 +28,19 @@ const consoleFormat = winston.format.combine(
   winston.format.colorize({ all: true }),
   winston.format.printf(({ timestamp, level, message, service, requestId, userId, ...meta }) => {
     let logMessage = `${timestamp} [${service || 'APP'}] ${level}: ${message}`;
-    
+
     if (requestId) {
       logMessage += ` (reqId: ${requestId})`;
     }
-    
+
     if (userId) {
       logMessage += ` (userId: ${userId})`;
     }
-    
+
     if (Object.keys(meta).length > 0) {
       logMessage += ` ${JSON.stringify(meta)}`;
     }
-    
+
     return logMessage;
   })
 );
@@ -110,13 +110,13 @@ const logger = winston.createLogger({
     httpTransport
   ],
   exceptionHandlers: [
-    new winston.transports.File({ 
+    new winston.transports.File({
       filename: path.join(logDir, 'exceptions.log'),
       format: fileFormat
     })
   ],
   rejectionHandlers: [
-    new winston.transports.File({ 
+    new winston.transports.File({
       filename: path.join(logDir, 'rejections.log'),
       format: fileFormat
     })
@@ -286,34 +286,34 @@ const logApiResponse = (endpoint, method, duration, statusCode, req) => {
 // Express middleware for request logging
 const requestLogger = (req, res, next) => {
   const startTime = Date.now();
-  
+
   // Generate request ID if not present
   req.id = req.headers['x-request-id'] || require('crypto').randomUUID();
   res.setHeader('X-Request-ID', req.id);
-  
+
   // Log incoming request
   logHttp('Incoming Request', createLogContext(req, {
     body: req.method !== 'GET' ? req.body : undefined
   }));
-  
+
   // Override res.end to log response
   const originalEnd = res.end;
   res.end = function(chunk, encoding) {
     const duration = Date.now() - startTime;
-    
+
     // Log response
     logHttp('Request Completed', createLogContext(req, {
       statusCode: res.statusCode,
       duration,
       contentLength: res.get('content-length')
     }));
-    
+
     // Log performance metric
     logApiResponse(req.route?.path || req.path, req.method, duration, res.statusCode, req);
-    
+
     originalEnd.call(this, chunk, encoding);
   };
-  
+
   next();
 };
 
@@ -322,7 +322,7 @@ const errorLogger = (err, req, res, next) => {
   const context = createLogContext(req, {
     statusCode: err.status || 500
   });
-  
+
   logError('Request Error', err, context);
   next(err);
 };
@@ -332,7 +332,7 @@ const securityLogger = (req, res, next) => {
   // Log suspicious activities
   const userAgent = req.get('User-Agent');
   const ip = req.ip;
-  
+
   // Check for common attack patterns
   if (req.url.includes('..') || req.url.includes('<script>')) {
     logAudit('suspicious_request', req.user, {
@@ -342,9 +342,9 @@ const securityLogger = (req, res, next) => {
       userAgent
     });
   }
-  
+
   // Log sensitive operations
-  if (req.method === 'DELETE' || 
+  if (req.method === 'DELETE' ||
       (req.method === 'POST' && req.url.includes('/admin'))) {
     logAudit('sensitive_operation', req.user, {
       method: req.method,
@@ -353,7 +353,7 @@ const securityLogger = (req, res, next) => {
       userAgent
     });
   }
-  
+
   next();
 };
 
@@ -362,7 +362,7 @@ const dbLogger = {
   logQuery: (collection, operation, query, duration) => {
     logDatabaseQuery(`${operation} on ${collection}`, duration, collection);
   },
-  
+
   logSlowQuery: (collection, operation, query, duration) => {
     if (duration > 1000) { // Log queries slower than 1 second
       logWarning('Slow Database Query', {
@@ -405,14 +405,14 @@ module.exports = {
   logger,
   auditLogger,
   performanceLogger,
-  
+
   // Logging functions
   logInfo,
   logError,
   logWarning,
   logDebug,
   logHttp,
-  
+
   // Audit functions
   logAudit,
   logLogin,
@@ -420,22 +420,22 @@ module.exports = {
   logFailedLogin,
   logDataAccess,
   logAdminAction,
-  
+
   // Performance functions
   logPerformance,
   logDatabaseQuery,
   logApiResponse,
-  
+
   // Middleware
   requestLogger,
   errorLogger,
   securityLogger,
-  
+
   // Specialized loggers
   dbLogger,
   healthLogger,
   shutdownLogger,
-  
+
   // Utilities
   createLogContext
 };

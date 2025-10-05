@@ -1,72 +1,72 @@
 {
-  "name": "smart-laundry-system",
-  "version": "1.0.0",
-  "description": "Enterprise-grade smart laundry management platform with AI/ML integration, blockchain payments, and IoT device management",
-  "main": "index.js",
-  "scripts": {
-    "dev": "concurrently \"npm run dev:auth\" \"npm run dev:laundry\" \"npm run dev:payment\" \"npm run dev:notification\" \"npm run dev:frontend\"",
-    "dev:auth": "cd backend/auth-service && npm run dev",
-    "dev:laundry": "cd backend/laundry-service && npm run dev",
-    "dev:payment": "cd backend/payment-service && npm run dev",
-    "dev:notification": "cd backend/notification-service && npm run dev",
-    "dev:gateway": "cd backend/api-gateway && npm run dev",
-    "dev:frontend": "cd frontend/web && npm run dev",
-    "build": "npm run build:auth && npm run build:laundry && npm run build:payment && npm run build:notification && npm run build:frontend",
-    "build:auth": "cd backend/auth-service && npm run build",
-    "build:laundry": "cd backend/laundry-service && npm run build",
-    "build:payment": "cd backend/payment-service && npm run build",
-    "build:notification": "cd backend/notification-service && npm run build",
-    "build:gateway": "cd backend/api-gateway && npm run build",
-    "build:frontend": "cd frontend/web && npm run build",
-    "install:all": "npm install && npm run install:backend && npm run install:frontend && npm run install:ai",
-    "install:backend": "cd backend/auth-service && npm install && cd ../laundry-service && npm install && cd ../payment-service && npm install && cd ../notification-service && npm install && cd ../api-gateway && npm install",
-    "install:frontend": "cd frontend/web && npm install",
-    "install:ai": "cd ai-ml && pip install -r requirements.txt",
-    "test": "npm run test:backend && npm run test:frontend",
-    "test:backend": "cd backend/auth-service && npm test && cd ../laundry-service && npm test",
-    "test:frontend": "cd frontend/web && npm test",
-    "lint": "npm run lint:backend && npm run lint:frontend",
-    "lint:backend": "cd backend/auth-service && npm run lint && cd ../laundry-service && npm run lint",
-    "lint:frontend": "cd frontend/web && npm run lint",
-    "docker:build": "docker-compose -f infra/docker-compose.yml build",
-    "docker:up": "docker-compose -f infra/docker-compose.yml up -d",
-    "docker:down": "docker-compose -f infra/docker-compose.yml down",
-    "docker:logs": "docker-compose -f infra/docker-compose.yml logs -f",
-    "migrate": "node scripts/db-migrate.sh",
-    "seed": "node scripts/seed-data.js",
-    "deploy": "bash scripts/deploy.sh"
-  },
-  "workspaces": [
-    "backend/auth-service",
-    "backend/laundry-service",
-    "backend/payment-service",
-    "backend/notification-service",
-    "backend/api-gateway",
-    "frontend/web"
-  ],
-  "devDependencies": {
-    "concurrently": "^8.2.0",
-    "cross-env": "^7.0.3"
-  },
-  "keywords": [
-    "laundry",
-    "smart",
-    "ai",
-    "ml",
-    "blockchain",
-    "iot",
-    "microservices",
-    "hackathon",
-    "management"
-  ],
-  "author": "Smart Laundry Team",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/DevPrasath6/SmartLaundrySystem-ADYA.git"
-  },
-  "bugs": {
-    "url": "https://github.com/DevPrasath6/SmartLaundrySystem-ADYA/issues"
-  },
-  "homepage": "https://github.com/DevPrasath6/SmartLaundrySystem-ADYA#readme"
+    "name": "smart-laundry-system",
+    "version": "1.0.0",
+    "description": "Enterprise-grade smart laundry management platform with AI/ML integration, blockchain payments, and IoT device management",
+    "main": "index.js",
+    "scripts": {
+        "dev": "concurrently \"npm run dev:auth\" \"npm run dev:laundry\" \"npm run dev:payment\" \"npm run dev:notification\" \"npm run dev:frontend\"",
+        "dev:auth": "cd backend/auth-service && npm run dev",
+        "dev:laundry": "cd backend/laundry-service && npm run dev",
+        "dev:payment": "cd backend/payment-service && npm run dev",
+        "dev:notification": "cd backend/notification-service && npm run dev",
+        "dev:gateway": "cd backend/api-gateway && npm run dev",
+        "dev:frontend": "cd frontend/web && npm run dev",
+        "build": "npm run build:auth && npm run build:laundry && npm run build:payment && npm run build:notification && npm run build:frontend",
+        "build:auth": "cd backend/auth-service && npm run build",
+        "build:laundry": "cd backend/laundry-service && npm run build",
+        "build:payment": "cd backend/payment-service && npm run build",
+        "build:notification": "cd backend/notification-service && npm run build",
+        "build:gateway": "cd backend/api-gateway && npm run build",
+        "build:frontend": "cd frontend/web && npm run build",
+        "install:all": "npm install && npm run install:backend && npm run install:frontend && npm run install:ai",
+        "install:backend": "cd backend/auth-service && npm install && cd ../laundry-service && npm install && cd ../payment-service && npm install && cd ../notification-service && npm install && cd ../api-gateway && npm install",
+        "install:frontend": "cd frontend/web && npm install",
+        "install:ai": "cd ai-ml && pip install -r requirements.txt",
+        "test": "npm run test:backend && npm run test:frontend",
+        "test:backend": "cd backend/auth-service && npm test && cd ../laundry-service && npm test",
+        "test:frontend": "cd frontend/web && npm test",
+        "lint": "npm run lint:backend && npm run lint:frontend",
+        "lint:backend": "cd backend/auth-service && npm run lint && cd ../laundry-service && npm run lint",
+        "lint:frontend": "cd frontend/web && npm run lint",
+        "docker:build": "docker-compose -f infra/docker-compose.yml build",
+        "docker:up": "docker-compose -f infra/docker-compose.yml up -d",
+        "docker:down": "docker-compose -f infra/docker-compose.yml down",
+        "docker:logs": "docker-compose -f infra/docker-compose.yml logs -f",
+        "migrate": "node scripts/db-migrate.sh",
+        "seed": "node scripts/seed-data.js",
+        "deploy": "bash scripts/deploy.sh"
+    },
+    "workspaces": [
+        "backend/auth-service",
+        "backend/laundry-service",
+        "backend/payment-service",
+        "backend/notification-service",
+        "backend/api-gateway",
+        "frontend/web"
+    ],
+    "devDependencies": {
+        "concurrently": "^8.2.0",
+        "cross-env": "^7.0.3"
+    },
+    "keywords": [
+        "laundry",
+        "smart",
+        "ai",
+        "ml",
+        "blockchain",
+        "iot",
+        "microservices",
+        "hackathon",
+        "management"
+    ],
+    "author": "Smart Laundry Team",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DevPrasath6/SmartLaundrySystem-ADYA.git"
+    },
+    "bugs": {
+        "url": "https://github.com/DevPrasath6/SmartLaundrySystem-ADYA/issues"
+    },
+    "homepage": "https://github.com/DevPrasath6/SmartLaundrySystem-ADYA#readme"
 }
