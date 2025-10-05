@@ -1,0 +1,24 @@
+{
+    "name": "iot-firmware-simulation",
+    "version": "1.0.0",
+    "description": "IoT firmware simulation for smart laundry devices",
+    "main": "firmware_simulation.py",
+    "scripts": {
+        "start": "python firmware_simulation.py",
+        "start:washer": "python firmware_simulation.py washer1 washer",
+        "start:dryer": "python firmware_simulation.py dryer1 dryer",
+        "start:dispenser": "python firmware_simulation.py dispenser1 dispenser"
+    },
+    "dependencies": {
+        "paho-mqtt": "^1.6.1"
+    },
+    "keywords": [
+        "iot",
+        "firmware",
+        "mqtt",
+        "laundry",
+        "simulation"
+    ],
+    "author": "Smart Laundry Team",
+    "license": "MIT"
+}

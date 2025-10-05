@@ -1,0 +1,201 @@
+version: '3.8'
+
+services:
+  # Database Services
+  mongodb:
+    image: mongo:7.0
+    container_name: adya-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: adya
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - adya-network
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: adya-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - adya-network
+
+  # Backend Services
+  api-gateway:
+    build:
+      context: ../backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: adya-api-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - LAUNDRY_SERVICE_URL=http://laundry-service:3002
+      - PAYMENT_SERVICE_URL=http://payment-service:3003
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3004
+      - LOSTFOUND_SERVICE_URL=http://lostfound-service:3005
+      - REPORTING_SERVICE_URL=http://reporting-service:3006
+    depends_on:
+      - redis
+      - mongodb
+    networks:
+      - adya-network
+
+  auth-service:
+    build:
+      context: ../backend/auth-service
+      dockerfile: Dockerfile
+    container_name: adya-auth-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - MONGO_URI=mongodb://admin:password@mongodb:27017/adya_auth?authSource=admin
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - adya-network
+
+  laundry-service:
+    build:
+      context: ../backend/laundry-service
+      dockerfile: Dockerfile
+    container_name: adya-laundry-service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - MONGO_URI=mongodb://admin:password@mongodb:27017/adya_laundry?authSource=admin
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - adya-network
+
+  payment-service:
+    build:
+      context: ../backend/payment-service
+      dockerfile: Dockerfile
+    container_name: adya-payment-service
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - MONGO_URI=mongodb://admin:password@mongodb:27017/adya_payments?authSource=admin
+      - STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+      - STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+      - ETHEREUM_NETWORK=sepolia
+      - ETHEREUM_PRIVATE_KEY=your_ethereum_private_key
+    depends_on:
+      - mongodb
+    networks:
+      - adya-network
+
+  notification-service:
+    build:
+      context: ../backend/notification-service
+      dockerfile: Dockerfile
+    container_name: adya-notification-service
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - MONGO_URI=mongodb://admin:password@mongodb:27017/adya_notifications?authSource=admin
+      - REDIS_URL=redis://redis:6379
+      - SENDGRID_API_KEY=your_sendgrid_api_key
+      - TWILIO_ACCOUNT_SID=your_twilio_account_sid
+      - TWILIO_AUTH_TOKEN=your_twilio_auth_token
+      - FIREBASE_SERVER_KEY=your_firebase_server_key
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - adya-network
+
+  lostfound-service:
+    build:
+      context: ../backend/lostfound-service
+      dockerfile: Dockerfile
+    container_name: adya-lostfound-service
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=development
+      - PORT=3005
+      - MONGO_URI=mongodb://admin:password@mongodb:27017/adya_lostfound?authSource=admin
+      - AI_MODEL_PATH=/app/models/item_matcher.json
+    depends_on:
+      - mongodb
+    networks:
+      - adya-network
+
+  reporting-service:
+    build:
+      context: ../backend/reporting-service
+      dockerfile: Dockerfile
+    container_name: adya-reporting-service
+    restart: unless-stopped
+    ports:
+      - "3006:3006"
+    environment:
+      - NODE_ENV=development
+      - PORT=3006
+      - MONGO_URI=mongodb://admin:password@mongodb:27017/adya_reporting?authSource=admin
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - adya-network
+
+  # Frontend Services
+  web-frontend:
+    build:
+      context: ../frontend/web
+      dockerfile: Dockerfile
+    container_name: adya-web-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:3000
+      - VITE_APP_NAME=Smart Laundry System
+    depends_on:
+      - api-gateway
+    networks:
+      - adya-network
+
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  adya-network:
+    driver: bridge

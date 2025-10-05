@@ -1,0 +1,26 @@
+# MQTT Access Control List
+# Defines topic access permissions for users
+
+# Admin user - full access
+user admin
+topic readwrite #
+
+# Device user - can publish status and subscribe to commands
+user device
+topic read laundry/+/commands
+topic write laundry/+/status
+topic write laundry/+/events
+topic write laundry/+/sensors
+
+# Service user - can subscribe to all device topics and publish commands
+user service
+topic read laundry/+/status
+topic read laundry/+/events
+topic read laundry/+/sensors
+topic write laundry/+/commands
+
+# Pattern explanation:
+# laundry/+/commands   - Commands to specific devices (e.g., laundry/washer1/commands)
+# laundry/+/status     - Device status updates (e.g., laundry/washer1/status)
+# laundry/+/events     - Device events (e.g., laundry/dryer2/events)
+# laundry/+/sensors    - Sensor data (e.g., laundry/washer1/sensors)
