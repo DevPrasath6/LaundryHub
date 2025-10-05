@@ -1,0 +1,210 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+  namespace: smart-laundry
+type: Opaque
+data:
+  password: YWRtaW4xMjM= # admin123 (base64 encoded)
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwt-secret
+  namespace: smart-laundry
+type: Opaque
+data:
+  secret: eW91ci1zdXBlci1zZWNyZXQtand0LWtleS1jaGFuZ2UtdGhpcy1pbi1wcm9kdWN0aW9u # your-super-secret-jwt-key-change-this-in-production
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: payment-secrets
+  namespace: smart-laundry
+type: Opaque
+data:
+  stripe-secret: c2tfdGVzdF95b3VyX3N0cmlwZV9zZWNyZXRfa2V5 # sk_test_your_stripe_secret_key
+  paypal-secret: eW91cl9wYXlwYWxfY2xpZW50X3NlY3JldA== # your_paypal_client_secret
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: notification-secrets
+  namespace: smart-laundry
+type: Opaque
+data:
+  twilio-token: eW91cl90d2lsaW9fYXV0aF90b2tlbg== # your_twilio_auth_token
+  sendgrid-key: eW91cl9zZW5kZ3JpZF9hcGlfa2V5 # your_sendgrid_api_key
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: smart-laundry
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  CORS_ORIGIN: "*"
+  RATE_LIMIT_WINDOW_MS: "900000"
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  BCRYPT_ROUNDS: "12"
+  JWT_EXPIRES_IN: "1h"
+  JWT_REFRESH_EXPIRES_IN: "7d"
+  FEATURE_BLOCKCHAIN_PAYMENTS: "true"
+  FEATURE_AI_RECOMMENDATIONS: "true"
+  FEATURE_IOT_INTEGRATION: "true"
+  FEATURE_ADMIN_ANALYTICS: "true"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-config
+  namespace: smart-laundry
+data:
+  mongod.conf: |
+    storage:
+      dbPath: /data/db
+      journal:
+        enabled: true
+    systemLog:
+      destination: file
+      logAppend: true
+      path: /var/log/mongodb/mongod.log
+    net:
+      port: 27017
+      bindIp: 0.0.0.0
+    security:
+      authorization: enabled
+    replication:
+      replSetName: rs0
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: smart-laundry
+data:
+  redis.conf: |
+    bind 0.0.0.0
+    port 6379
+    tcp-backlog 511
+    timeout 0
+    tcp-keepalive 300
+    daemonize no
+    supervised no
+    pidfile /var/run/redis.pid
+    loglevel notice
+    logfile ""
+    databases 16
+    save 900 1
+    save 300 10
+    save 60 10000
+    stop-writes-on-bgsave-error yes
+    rdbcompression yes
+    rdbchecksum yes
+    dbfilename dump.rdb
+    dir /data
+    maxmemory 256mb
+    maxmemory-policy allkeys-lru
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: smart-laundry
+data:
+  nginx.conf: |
+    upstream api_backend {
+        server api-gateway:3000;
+    }
+    
+    upstream frontend_backend {
+        server frontend:80;
+    }
+    
+    server {
+        listen 80;
+        server_name smart-laundry.local;
+        
+        # Frontend routes
+        location / {
+            proxy_pass http://frontend_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # API routes
+        location /api/ {
+            proxy_pass http://api_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # CORS headers
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization' always;
+            
+            if ($request_method = 'OPTIONS') {
+                add_header 'Access-Control-Max-Age' 1728000;
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
+                add_header 'Content-Length' 0;
+                return 204;
+            }
+        }
+        
+        # WebSocket support for real-time notifications
+        location /socket.io/ {
+            proxy_pass http://api_backend;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Health check endpoint
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+    }
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: smart-laundry-sa
+  namespace: smart-laundry
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: smart-laundry
+  name: smart-laundry-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: smart-laundry-rolebinding
+  namespace: smart-laundry
+subjects:
+- kind: ServiceAccount
+  name: smart-laundry-sa
+  namespace: smart-laundry
+roleRef:
+  kind: Role
+  name: smart-laundry-role
+  apiGroup: rbac.authorization.k8s.io
