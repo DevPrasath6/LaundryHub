@@ -203,7 +203,7 @@ smart-laundry-system/
    ```bash
    # Copy environment template
    cp .env.example .env
-   
+
    # Edit with your settings
    nano .env
    ```
@@ -212,7 +212,7 @@ smart-laundry-system/
    ```bash
    # Install all service dependencies
    npm run install:all
-   
+
    # Install Python ML dependencies
    pip install -r ai-ml/requirements.txt
    ```
@@ -221,7 +221,7 @@ smart-laundry-system/
    ```bash
    # Start MongoDB and Redis
    docker-compose up -d mongodb redis
-   
+
    # Seed initial data
    npm run seed
    ```
@@ -290,7 +290,7 @@ git commit -m "docs: update API documentation for payment endpoints"
    ```bash
    # Apply Kubernetes manifests
    kubectl apply -f infra/k8s/
-   
+
    # Monitor deployment
    kubectl get pods -n smart-laundry
    ```

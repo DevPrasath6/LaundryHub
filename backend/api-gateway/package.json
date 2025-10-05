@@ -1,14 +1,15 @@
 {
     "name": "@adya/api-gateway",
+    "type": "module",
     "version": "1.0.0",
     "description": "API Gateway for Smart Laundry System",
     "main": "dist/index.js",
     "scripts": {
-        "start": "node dist/index.js",
-        "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-        "build": "tsc",
+        "start": "node src/app.js",
+        "dev": "node --enable-source-maps --loader ts-node/esm src/app.js",
+        "build": "echo \"No build required for JS entrypoint\"",
         "test": "jest",
-        "lint": "eslint src/**/*.ts"
+        "lint": "eslint src/**/*.js"
     },
     "dependencies": {
         "express": "^4.18.2",

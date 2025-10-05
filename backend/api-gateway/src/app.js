@@ -120,9 +120,7 @@ Object.keys(services).forEach(serviceName => {
   const proxyMiddleware = createProxyMiddleware({
     target: service.url,
     changeOrigin: true,
-    pathRewrite: {
-      [`^/api/v1/${serviceName}`]: '/api/v1'
-    },
+    pathRewrite: (path, req) => path.replace(new RegExp(`^/api/v1`), '/api'),
     onError: (err, req, res) => {
       console.error(`Proxy error for ${serviceName}:`, err.message);
       res.status(503).json({
