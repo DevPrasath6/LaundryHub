@@ -1,0 +1,57 @@
+#!/usr/bin/env sh
+# commit-msg hook to enforce professional, non-AI, descriptive commit messages.
+# Exits non-zero to reject the commit when message doesn't meet rules.
+
+MSG_FILE="$1"
+
+if [ -z "$MSG_FILE" ]; then
+  echo "[commit-msg-hook] No commit message file provided." >&2
+  exit 1
+fi
+
+MSG=$(sed -n '1,50p' "$MSG_FILE" | tr -d '\r')
+
+# Trim leading/trailing whitespace
+MSG_TRIMMED=$(echo "$MSG" | sed 's/^\s*//;s/\s*$//')
+
+# Rules
+MIN_LENGTH=10
+
+reject() {
+  echo "Commit message rejected by commit-msg hook:" >&2
+  echo "  $1" >&2
+  echo "" >&2
+  echo "Guidance: Use a short (50 char) summary, then a blank line and a detailed body. Avoid 'wip', 'fixup', 'temp', 'ai', 'generated', 'auto', or 'bot' in messages." >&2
+  echo "Example: 'feat(auth): add JWT refresh token endpoint'" >&2
+  exit 1
+}
+
+if [ -z "$MSG_TRIMMED" ]; then
+  reject "empty commit message"
+fi
+
+# First line summary
+SUMMARY=$(echo "$MSG_TRIMMED" | sed -n '1p')
+
+# Reject very short messages
+if [ $(echo -n "$SUMMARY" | wc -c) -lt $MIN_LENGTH ]; then
+  reject "commit summary too short (minimum ${MIN_LENGTH} characters)"
+fi
+
+# Lowercase summary for keyword checks
+LOWER_SUMMARY=$(echo "$SUMMARY" | tr '[:upper:]' '[:lower:]')
+
+# Patterns to reject
+BAD_PATTERNS="\bwip\b|\btemp\b|\bfixup\b|\bmerge\b|\btest\b|\bdebug\b|\bexample\b"
+AI_PATTERNS="\bai\b|\bautomated\b|\bgenerated\b|\bauto\b|\bbot\b|\bchatgpt\b|\bgpt\b|\bcopy\b|\bopenai\b"
+
+echo "$LOWER_SUMMARY" | grep -Eq "$BAD_PATTERNS" && reject "contains informal or placeholder word (wip/temp/fixup/merge/test/debug)"
+echo "$LOWER_SUMMARY" | grep -Eq "$AI_PATTERNS" && reject "contains AI/automation related word; please write a human-authored, professional message"
+
+# Discourage one-word vague summaries like 'Update' or 'Initial'
+if echo "$LOWER_SUMMARY" | grep -Eiq "^(update|initial|changes|misc|miscellaneous|patch|refactor)$"; then
+  reject "vague one-word summary; provide clear intent (e.g. 'feat(api): add /login endpoint')"
+fi
+
+# All checks passed
+exit 0
