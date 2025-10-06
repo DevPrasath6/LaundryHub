@@ -1,0 +1,40 @@
+{
+    "name": "@adya/api-gateway",
+    "type": "module",
+    "version": "1.0.0",
+    "description": "API Gateway for Smart Laundry System",
+    "main": "dist/index.js",
+    "scripts": {
+        "start": "node src/app.js",
+        "dev": "node --enable-source-maps --loader ts-node/esm src/app.js",
+        "build": "echo \"No build required for JS entrypoint\"",
+        "test": "jest",
+        "lint": "eslint src/**/*.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "helmet": "^7.0.0",
+        "dotenv": "^16.3.1",
+        "http-proxy-middleware": "^2.0.6",
+        "express-rate-limit": "^6.10.0",
+        "winston": "^3.10.0",
+        "jsonwebtoken": "^9.0.2"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.17",
+        "@types/cors": "^2.8.13",
+        "@types/jsonwebtoken": "^9.0.2",
+        "@types/node": "^20.5.0",
+        "typescript": "^5.1.6",
+        "ts-node-dev": "^2.0.0"
+    },
+    "keywords": [
+        "api-gateway",
+        "microservice",
+        "proxy",
+        "routing"
+    ],
+    "author": "Smart Laundry Team",
+    "license": "MIT"
+}
