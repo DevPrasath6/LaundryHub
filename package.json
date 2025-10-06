@@ -1,6 +1,7 @@
 {
     "name": "smart-laundry-system",
     "version": "1.0.0",
+    "type": "module",
     "description": "Enterprise-grade smart laundry management platform with AI/ML integration, blockchain payments, and IoT device management",
     "main": "index.js",
     "scripts": {
