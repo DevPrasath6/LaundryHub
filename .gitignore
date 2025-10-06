@@ -11,6 +11,10 @@ dist/
 build/
 coverage/
 
+# Logs
+logs/
+*.log
+
 # Python
 venv/
 .venv/
