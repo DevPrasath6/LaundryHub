@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="bg-gradient-hero">
       {/* Hero Section */}
       <section className="container mx-auto px-4 pt-20 pb-32">
         <div className="text-center max-w-4xl mx-auto">
