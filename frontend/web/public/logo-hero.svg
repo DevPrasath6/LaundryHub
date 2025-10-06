@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <defs>
+    <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="heroSecondary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Washing Machine Icon -->
+  <g transform="translate(10, 10)">
+    <!-- Background Circle -->
+    <circle cx="20" cy="20" r="18" fill="url(#heroGradient)" />
+
+    <!-- Washing Machine Body -->
+    <rect x="8" y="12" width="24" height="20" rx="4" fill="white" opacity="0.95" />
+
+    <!-- Washing Machine Door -->
+    <circle cx="20" cy="22" r="7" fill="none" stroke="url(#heroSecondary)" stroke-width="2" />
+    <circle cx="20" cy="22" r="4" fill="url(#heroSecondary)" opacity="0.3" />
+
+    <!-- Control Panel -->
+    <rect x="12" y="15" width="16" height="3" rx="1" fill="url(#heroGradient)" opacity="0.8" />
+
+    <!-- Control Buttons -->
+    <circle cx="15" cy="16.5" r="0.8" fill="white" />
+    <circle cx="20" cy="16.5" r="0.8" fill="white" />
+    <circle cx="25" cy="16.5" r="0.8" fill="white" />
+
+    <!-- Smart indicator -->
+    <circle cx="32" cy="12" r="2" fill="#10b981" />
+    <circle cx="32" cy="12" r="1" fill="white" />
+  </g>
+
+  <!-- LaundryHub Text -->
+  <text x="65" y="35" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="url(#heroGradient)">LaundryHub</text>
+
+  <!-- Tagline -->
+  <text x="65" y="50" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Smart IoT Laundry Management</text>
+</svg>
